@@ -1,0 +1,49 @@
+<script src="https://unpkg.com/vue@next"></script>
+<div id="app"></div>
+
+<script>
+  const { createApp, ref, onMounted, onUnmounted } = Vue
+
+  function useAnother() {
+    const x = ref(999)
+    return { x }
+  }
+
+  function useMouse() {
+    const x = ref(0)
+    const y = ref(0)
+
+    const update = (e) => {
+      x.value = e.pageX
+      y.value = e.pageY
+    }
+
+    onMounted(() => {
+      window.addEventListener('mousemove', update)
+    })
+
+    onUnmounted(() => {
+      window.addEventListener('mousemove', update)
+    })
+
+    return { x, y }
+  }
+
+  const App = {
+    setup() {
+      const { x, y } = useMouse()
+      const { x: z } = useAnother()
+      const foo = ref('foo')
+      return {
+        foo,
+        z, // x: z  即：x =》 z  可解决命名空间冲突 
+        x,
+        y
+        // 不要写成 ...useMouse() 这种，会分不清楚 变量来自哪里，不可读的未知命名冲突； 而是要 明确 写出 x,y
+      }
+    },
+    template: `{{ x }} {{ y }} {{ z }} {{ foo }}`
+  }
+
+  createApp(App).mount('#app')
+</script>

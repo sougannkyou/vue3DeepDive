@@ -1,0 +1,70 @@
+<script src="https://unpkg.com/vue@next"></script>
+<div id="app"></div>
+
+<script>
+  const { createApp, h } = Vue
+
+  const Foo = {
+    data() {
+      return {
+        x: 0
+      }
+    },
+    render() {
+      return (
+        this.$slots.default &&
+        this.$slots.default({
+          x: 99999
+        })
+      )
+    }
+  }
+
+  const Mouse = {
+    data() {
+      return {
+        x: 0,
+        y: 0
+      }
+    },
+    methods: {
+      update(e) {
+        this.x = e.pageX
+        this.y = e.pageY
+      }
+    },
+    mounted() {
+      window.addEventListener('mousemove', this.update)
+    },
+    unmounted() {
+      window.addEventListener('mousemove', this.update)
+    },
+    // template: `<slot :x="x" :y="y" />`,
+    render() {
+      return (
+        this.$slots.default &&
+        this.$slots.default({
+          x: this.x,
+          y: this.y
+        })
+      )
+    }
+  }
+
+  // 高阶组件的不断包装也解决不了 props的 显式从属，method命名冲突 问题
+  // Vue 使用 slots 来解决 
+  // 1）来源不明
+  // 2）x: foo  即：x =》 foo  可解决命名空间冲突 
+  const App = {
+    components: { Mouse, Foo },
+    template: `
+    <Mouse v-slot="{ x, y }">
+      <Foo v-slot="{ x: foo }">
+        {{ x }} {{ y }} - {{ foo }}
+      </Foo>
+    </Mouse>
+    `
+  }
+
+  createApp(App).mount('#app')
+</script>

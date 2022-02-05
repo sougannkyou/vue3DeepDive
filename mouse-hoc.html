@@ -1,0 +1,52 @@
+<script src="https://unpkg.com/vue@next"></script>
+<div id="app"></div>
+
+<script>
+  const { createApp, h } = Vue
+
+  const withFoo = (Inner) => {
+    return Inner 
+  }
+
+  const withAnother = (Inner) => {
+    return Inner 
+  }
+
+  const withMouse = (Inner) => {
+    return {
+      data() {
+        return {
+          x: 0,
+          y: 0
+        }
+      },
+      methods: {
+        update(e) {
+          this.x = e.pageX
+          this.y = e.pageY
+        }
+      },
+      mounted() {
+        window.addEventListener('mousemove', this.update)
+      },
+      unmounted() {
+        window.addEventListener('mousemove', this.update)
+      },
+      render() {
+        return h(Inner, {
+          x: this.x,
+          y: this.y
+        })
+      }
+    }
+  }
+
+  // 高阶组件的不断包装也解决不了 props的 显式从属，method命名冲突 问题
+  // Vue 使用 slots 来解决
+  const App = withFoo(withAnother(withMouse({
+    props: ['x', 'y', 'foo', 'bar'],
+    template: `{{ x }} {{ y }}`
+  })))
+
+  createApp(App).mount('#app')
+</script>

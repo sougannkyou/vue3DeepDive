@@ -25,9 +25,19 @@
     }
   }
 
+  const AnotherMixin = {
+    data() {
+      return {
+        z: 0
+      }
+    }
+  }
+
   const App = {
-    mixins: [MouseMixin],
-    template: `{{ x }} {{ y }}`
+    // 多个Mixin同时存在的时候，命名冲突， 以及 x，y  来自哪个Mixin就会变得难以理解 
+    //  在React中的解决方案 是HOC（高阶组件）
+    mixins: [MouseMixin, AnotherMixin],
+    template: `{{ x }} {{ y }} {{ z }}`
   }
 
   createApp(App).mount('#app')
